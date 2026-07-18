@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+:root {
+  --siarf-50: #EACFFC;
+  --siarf-100: #D59EFA;
+  --siarf-200: #C06EF7;
+  --siarf-300: #AB3DF5;
+  --siarf-400: #960DF2;
+  --siarf-500: #780AC2;
+  --siarf-600: #5A0891;
+  --siarf-700: #3C0561;
+  --gold: #C9A84C;
+  --gold-light: #D4B96A;
+}
+
+body {
+  background-color: var(--siarf-700);
+  color: white;
+  font-family: 'Inter', sans-serif;
+}

@@ -14,6 +14,32 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U siarf_user -d siarf_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: siarf_backend
+    environment:
+      DATABASE_URL: postgresql://siarf_user:siarf_password_2026@postgres:5432/siarf_db
+      SECRET_KEY: siarf_jwt_secret_key_2026_cemac_minpostel
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 1440
+      SEUIL_CRITIQUE: 70
+      SEUIL_MOYEN: 40
+      CONTAMINATION_RATE: 0.05
+      APP_NAME: SIARF
+      APP_VERSION: 1.0.0
+      ENVIRONMENT: production
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
 
 volumes:
   postgres_data:
