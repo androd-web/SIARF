@@ -45,7 +45,7 @@ function StepDot({ done, active, num }: { done: boolean; active: boolean; num: n
   );
 }
 
-function Field({
+ function Field({
   label, children, valid, error, touched,
 }: {
   label: string;
@@ -61,7 +61,7 @@ function Field({
         {label}
       </label>
       {children}
-      {touched && error && (
+      {touched && !valid && error && (
         <p className="text-[11px] text-red-600 ml-1">{error}</p>
       )}
     </div>
@@ -69,10 +69,12 @@ function Field({
 }
 
 function Input({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   valid, touched, error, ...props
 }: React.InputHTMLAttributes<HTMLInputElement> & { valid?: boolean; touched?: boolean; error?: string }) {
   const borderColor = !touched ? "#cec3d1" : valid ? "var(--siarf-400)" : "#ba1a1a";
   const bg = !touched ? "#fafafa" : valid ? "#f5f0ff" : "#fff5f5";
+
   return (
     <div className="relative">
       <input
@@ -80,17 +82,18 @@ function Input({
         className="block w-full h-10 px-4 rounded outline-none transition-all text-sm pr-10"
         style={{ border: `1.5px solid ${borderColor}`, background: bg, color: "#1b1b1c" }}
       />
-      {touched && (
+      {touched && valid && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          {valid ? (
-            <svg className="w-4 h-4" style={{ color: "var(--siarf-500)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-            </svg>
-          ) : (
-            <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          )}
+          <svg className="w-4 h-4" style={{ color: "var(--siarf-500)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+      )}
+      {touched && !valid && (
+        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+          <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </div>
       )}
     </div>
@@ -596,7 +599,7 @@ export default function RegisterPage() {
 
           <p className="text-center mt-6 text-xs" style={{ color: "#4c4450" }}>
             Déjà inscrit ?{" "}
-            <a href="/auth/login" className="font-bold hover:underline" style={{ color: "var(--siarf-700)" }}>
+            <a href="/login" className="font-bold hover:underline" style={{ color: "var(--siarf-700)" }}>
               Connectez-vous
             </a>
           </p>

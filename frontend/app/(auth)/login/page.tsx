@@ -12,11 +12,26 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    setLoading(true);
-    // TODO: appel API POST /auth/login
+  setLoading(true);
+  try {
+    const res = await fetch("http://localhost:8000/api/v1/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
+    localStorage.setItem("siarf_token", data.access_token);
+    localStorage.setItem("siarf_user", JSON.stringify(data.user));
+    localStorage.setItem("siarf_banque", JSON.stringify(data.banque));
     router.push("/dashboard");
+  } catch (err: unknown) {
+  const message = err instanceof Error ? err.message : "Erreur de connexion";
+  alert(message);
+  } finally {
     setLoading(false);
-  };
+  }
+};
 
   return (
     <div
@@ -393,22 +408,25 @@ export default function LoginPage() {
                 </button>
               </div>
 
-              <div className="text-center">
+              <div className="text-center text-xs">
+                <span> Problème de connexion ? </span>
                 <a
                   href="#"
-                  className="text-xs transition-colors hover:underline underline-offset-4"
+                  className=" transition-colors hover:underline underline-offset-4"
                   style={{ color: "var(--siarf-500)" }}
                 >
-                  Problème de connexion ? Contactez le support informatique.
+                 Contactez le support informatique.
                 </a>
               </div>
-              <div className="text-center">
+              <div className="text-center text-xs"> 
+                <span>Pas encore de compte ? </span>    
+
                 <a
-                  href="/auth/register"
-                  className="text-xs transition-colors hover:underline underline-offset-4"
+                  href="/register" 
+                  className=" transition-colors hover:underline underline-offset-4"
                   style={{ color: "var(--siarf-500)" }}
                 >
-                  Pas encore de compte ? Créez-en un.
+                   Créez-en un.
                 </a>
               </div>
             </div>
