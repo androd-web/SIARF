@@ -424,15 +424,43 @@ export default function RegisterPage() {
   const [step1Data, setStep1Data] = useState<Step1Data | null>(null);
   const [step2Data, setStep2Data] = useState<Step2Data | null>(null);
 
-  const handleSubmit = async (step3: Step3Data) => {
-    setLoading(true);
-    // TODO: appel API POST /auth/register
-    console.log({ ...step1Data, ...step2Data, ...step3 });
-    await new Promise(r => setTimeout(r, 1500));
-    router.push("/auth/login");
-    setLoading(false);
-  };
+ const handleSubmit = async (step3: Step3Data) => {
+  setLoading(true);
+  try {
+    const res = await fetch("http://localhost:8000/api/v1/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nom:             step2Data?.nom,
+        prenom:          step2Data?.prenom,
+        email:           step2Data?.email,
+        telephone:       step2Data?.telephone,
+        password:        step3.password,
+        role:            "agent",
+        code_activation: step1Data?.codeActivation,
+      }),
+    });
 
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.detail ?? "Erreur lors de l'inscription");
+      return;
+    }
+
+    // Connexion automatique après inscription
+    localStorage.setItem("siarf_token", data.access_token);
+    localStorage.setItem("siarf_user", JSON.stringify(data.user));
+    localStorage.setItem("siarf_banque", JSON.stringify(data.banque));
+
+    router.push("/dashboard");
+
+  } catch {
+    alert("Impossible de contacter le serveur.");
+  } finally {
+    setLoading(false);
+  }
+};
   const stepLabels = ["Code d'activation", "Informations", "Sécurité"];
 
   return (

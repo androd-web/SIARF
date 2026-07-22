@@ -10,24 +10,35 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [totp, setTotp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = async () => {
+ const handleLogin = async () => {
   setLoading(true);
+  setError("");
+
   try {
     const res = await fetch("http://localhost:8000/api/v1/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
+
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail);
+
+    if (!res.ok) {
+      setError(data.detail ?? "Erreur de connexion");
+      return;
+    }
+
+    // Stocker le token et les infos utilisateur
     localStorage.setItem("siarf_token", data.access_token);
     localStorage.setItem("siarf_user", JSON.stringify(data.user));
     localStorage.setItem("siarf_banque", JSON.stringify(data.banque));
+
     router.push("/dashboard");
-  } catch (err: unknown) {
-  const message = err instanceof Error ? err.message : "Erreur de connexion";
-  alert(message);
+
+  } catch {
+    setError("Impossible de contacter le serveur. Vérifiez que le backend est lancé.");
   } finally {
     setLoading(false);
   }
@@ -225,6 +236,9 @@ export default function LoginPage() {
                 Veuillez entrer vos identifiants institutionnels pour accéder au
                 portail SIARF.
               </p>
+              {error && (
+                <div className="text-red-500 text-sm">{error}</div>
+              )}
             </div>
 
             <div className="space-y-4">
